@@ -1,6 +1,7 @@
 // NavBar
 import './styles.css';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const NavBar = () => (
   <nav className="main-nav">
@@ -14,8 +15,10 @@ const NavBar = () => (
     </a>
     <div>
       <a className="main-nav-item">
+      <Link to="/signin" className="main-nav-item">
         <i className="fa fa-user-circle"></i>
         Sign In
+      </Link>
       </a>
     </div>
   </nav>

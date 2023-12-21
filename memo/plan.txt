@@ -1,0 +1,10 @@
+- src
+  - components
+    - NavBar.jsx
+    - HeroSection.jsx
+    - FeaturesSection.jsx
+    - Footer.jsx
+  - pages
+    - HomePage.jsx
+  - App.jsx
+  - index.js

@@ -1,8 +1,8 @@
 // actions.js
 
-export const login = (user) => ({
+export const login = (token) => ({
   type: 'LOGIN',
-  payload: { user },
+  payload: { token },
 });
 
 export const logout = () => ({

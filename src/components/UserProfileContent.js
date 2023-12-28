@@ -1,11 +1,14 @@
 // UserProfileContent.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUserProfile } from '../actions';
 
 const UserProfileContent = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+ // État local pour gérer l'édition
+  const [isEditing, setEditing] = useState(false);
+  const [editedUserName, setEditedUserName] = useState(user.username);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -34,6 +37,9 @@ const UserProfileContent = () => {
 
         const responseData = await response.json();
         localStorage.setItem('userName', responseData.body.userName);
+        localStorage.setItem('firstName', responseData.body.firstName);
+        localStorage.setItem('lastName', responseData.body.lastName);
+
         dispatch(getUserProfile(responseData.body));
       } catch (error) {
         console.error('Error fetching user profile:', error.message);
@@ -43,12 +49,50 @@ const UserProfileContent = () => {
     fetchUserProfile();
   }, [dispatch]);
 
+  const handleEditClick = () => {
+    setEditing(true);
+  };
+
+const handleSaveClick = () => {
+    // Ici tu peux envoyer une requête pour sauvegarder les modifications du nom d'utilisateur
+    // et mettre à jour l'état local en conséquence.
+
+    // Après avoir sauvegardé, tu peux revenir en mode non édition.
+    setEditing(false);
+  };
+
   return (
     <main className="main bg-dark">
-      <div className="header">
-        <h1>Welcome back {localStorage.getItem('userName')}!</h1>
-        <button className="edit-button">Edit Name</button>
-      </div>
+     {isEditing ? (
+        <div className="header">
+          <h2>Edit User Info</h2>
+          <label>User Name: </label>
+
+          <input
+            type="text"
+            value={localStorage.getItem('userName')}
+            onChange={(e) => setEditedUserName(e.target.value)}
+          />
+          <br/>
+          <br/>
+          <label>First Name: </label>
+          <input type="text" value={localStorage.getItem('firstName')} disabled />
+          <br/>
+          <br/>
+          <label>Last Name: </label>
+          <input type="text" value={localStorage.getItem('lastName')} disabled />
+          <br/>
+          <br/>
+          <button onClick={handleSaveClick}>Save</button>
+        </div>
+      ) : (
+        <div className="header">
+          <h1>Welcome back {localStorage.getItem('userName')}!</h1>
+          <button className="edit-button" onClick={handleEditClick}>
+            Edit Name
+          </button>
+        </div>
+      )}
       <h2 className="sr-only">Accounts</h2>
       <section className="account">
         <div className="account-content-wrapper">

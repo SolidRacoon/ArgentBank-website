@@ -1,11 +1,52 @@
 // UserProfileContent.js
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { getUserProfile } from '../actions';
 
 const UserProfileContent = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const tokenData = JSON.parse(window.localStorage.getItem("userAuthData"));
+
+        if (!tokenData || !tokenData.body || !tokenData.body.token) {
+          // Gérer l'absence de token, peut-être déconnecter l'utilisateur
+          return;
+        }
+
+        const token = tokenData.body.token;
+
+        const response = await fetch('http://localhost:3001/api/v1/user/profile', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user profile');
+        }
+
+        const responseData = await response.json();
+        localStorage.setItem('userName', responseData.body.userName);
+        dispatch(getUserProfile(responseData.body));
+      } catch (error) {
+        console.error('Error fetching user profile:', error.message);
+      }
+    };
+
+    fetchUserProfile();
+  }, [dispatch]);
+
   return (
     <main className="main bg-dark">
       <div className="header">
-        <h1>Welcome back<br />Tony Jarvis!</h1>
+        <h1>Welcome back {localStorage.getItem('userName')}!</h1>
         <button className="edit-button">Edit Name</button>
       </div>
       <h2 className="sr-only">Accounts</h2>

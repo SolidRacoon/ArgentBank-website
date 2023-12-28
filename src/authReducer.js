@@ -1,6 +1,6 @@
 // reducers/authReducer.js
-
 const initialState = {
+  user: null,
   token: null,
   isLoggedIn: false,
 };
@@ -10,12 +10,13 @@ const authReducer = (state = initialState, action) => {
     case 'LOGIN':
       return {
         ...state,
-        token: action.payload.token,
+        user: action.payload.user,
         isLoggedIn: true,
       };
     case 'LOGOUT':
       return {
         ...state,
+        user: null,
         token: null,
         isLoggedIn: false,
       };

@@ -1,14 +1,67 @@
-// UserProfileContent.js
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getUserProfile } from '../actions';
+import { getUserProfile, updateUsername, updateUserProfile } from '../actions';
 
 const UserProfileContent = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
- // État local pour gérer l'édition
+  const userName = user ? user.username : ''; // Utilisation de la variable user pour obtenir le nom d'utilisateur
+
+  // État local pour gérer l'édition
   const [isEditing, setEditing] = useState(false);
-  const [editedUserName, setEditedUserName] = useState(user.username);
+  const [editedUserName, setEditedUserName] = useState(userName);
+
+  const handleUsernameChange = (e) => {
+    setEditedUserName(e.target.value);
+  };
+
+  const handleSaveClick = async () => {
+    setEditing(false);
+    const newUsername = editedUserName;
+
+    // Mettre à jour le localStorage
+    localStorage.setItem('userName', newUsername);
+
+    // Dispatch l'action pour mettre à jour le store
+    dispatch(updateUsername(newUsername));
+
+    try {
+      const tokenData = JSON.parse(window.localStorage.getItem("userAuthData"));
+
+      if (!tokenData || !tokenData.body || !tokenData.body.token) {
+        // Gérer l'absence de token, peut-être déconnecter l'utilisateur
+        return;
+      }
+
+      const token = tokenData.body.token;
+
+      // Effectuer la requête PUT pour mettre à jour le profil de l'utilisateur
+      const response = await fetch('http://localhost:3001/api/v1/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userName: newUsername,
+          // Ajoute d'autres champs si nécessaire
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user profile');
+      }
+
+      const responseData = await response.json();
+
+      // Dispatch l'action pour mettre à jour le store avec les nouvelles données du profil
+      dispatch(updateUserProfile(responseData.body));
+
+    } catch (error) {
+      console.error('Error updating user profile:', error.message);
+    }
+  };
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -36,6 +89,7 @@ const UserProfileContent = () => {
         }
 
         const responseData = await response.json();
+        setEditedUserName(responseData.body.userName);
         localStorage.setItem('userName', responseData.body.userName);
         localStorage.setItem('firstName', responseData.body.firstName);
         localStorage.setItem('lastName', responseData.body.lastName);
@@ -53,25 +107,16 @@ const UserProfileContent = () => {
     setEditing(true);
   };
 
-const handleSaveClick = () => {
-    // Ici tu peux envoyer une requête pour sauvegarder les modifications du nom d'utilisateur
-    // et mettre à jour l'état local en conséquence.
-
-    // Après avoir sauvegardé, tu peux revenir en mode non édition.
-    setEditing(false);
-  };
-
   return (
     <main className="main bg-dark">
-     {isEditing ? (
+      {isEditing ? (
         <div className="header">
           <h2>Edit User Info</h2>
           <label>User Name: </label>
-
           <input
             type="text"
-            value={localStorage.getItem('userName')}
-            onChange={(e) => setEditedUserName(e.target.value)}
+            value={editedUserName}
+            onChange={handleUsernameChange}
           />
           <br/>
           <br/>

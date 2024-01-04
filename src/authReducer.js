@@ -20,11 +20,12 @@ const authReducer = (state = initialState, action) => {
         user: action.payload.user,
         token: window.localStorage.getItem("userAuthData"),
         isLoggedIn: true,
-        username: storedUserName || user.username,
-        lastName: storedName || user.lastName,
-        firstName: storedFirstName || user.firstName,
+        username: storedUserName || action.payload.user.username,
+        lastName: storedName || action.payload.user.lastName,
+        firstName: storedFirstName || action.payload.user.firstName,
       };
     case 'LOGOUT':
+localStorage.clear();
       return {
         ...state,
         user: null,
@@ -35,6 +36,13 @@ const authReducer = (state = initialState, action) => {
         lastName:null,
 
       };
+
+       case 'UPDATE_USERNAME':
+      return {
+        ...state,
+        username: action.payload.newUsername,
+      };
+
     default:
       return state;
   }

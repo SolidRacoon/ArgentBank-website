@@ -25,17 +25,19 @@ const SignInForm = () => {
     const password = passwordInput.value;
 
     try {
-
       const { user, token } = await loginUser(email, password);
-      dispatch(login({user, token}));
+      dispatch(login({ user, token }));
+
+      // Chargez immédiatement les données du profil
+      dispatch(getUserProfile(user));
 
       navigate('/UserProfile');
-
     } catch (error) {
       console.error('Login error:', error.message);
       // Gérer l'échec de la connexion ici
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit}>

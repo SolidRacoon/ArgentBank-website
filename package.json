@@ -35,6 +35,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "image-webpack-loader": "^8.1.0",
     "nodemon": "^2.0.4",
     "react-scripts": "^5.0.1"
   },

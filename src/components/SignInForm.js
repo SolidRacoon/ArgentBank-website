@@ -1,15 +1,17 @@
-import React from 'react';
+
 import { useDispatch } from 'react-redux';
 import { login } from '../actions';
 import { loginUser } from '../api/userApi';
 import { getUserProfile } from '../actions'; // Importez la nouvelle action
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import React, { useState } from 'react';
+
 
 const SignInForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+const [authError, setAuthError] = useState(null);
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -33,7 +35,9 @@ const SignInForm = () => {
 
       navigate('/UserProfile');
     } catch (error) {
-      console.error('Login error:', error.message);
+       console.error('Login error:', error.message);
+  console.log('Error object:', error); // Ajout de cette ligne
+  setAuthError('Erreur d\'authentification. Vérifiez votre identifiant et votre mot de passe.');
       // Gérer l'échec de la connexion ici
     }
   };
@@ -41,6 +45,7 @@ const SignInForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
+    {authError && <div style={{ color: 'red' }}>{authError}</div>}
       <div className="input-wrapper">
         <label htmlFor="username">Username</label>
         <input type="text" id="username" />

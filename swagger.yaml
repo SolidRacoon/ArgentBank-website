@@ -101,6 +101,152 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+
+  /user/transactions/{accountId}/{year}/{month}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Get User Transactions for a Month and Account
+      description: API for fetching all transactions of a user for a specific month and account
+      parameters:
+        - in: path
+          name: accountId
+          type: string
+          required: true
+          description: ID of the account
+        - in: path
+          name: year
+          type: integer
+          required: true
+          description: Year of the transactions
+        - in: path
+          name: month
+          type: integer
+          required: true
+          description: Month of the transactions (1-12)
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          schema:
+            $ref: '#/definitions/TransactionWithId'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+
+  /user/transactions/{transactionId}/comment:
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Update Transaction Comment
+      description: API for add the comment of a specific transaction
+      parameters:
+        - in: path
+          name: transactionId
+          type: string
+          required: true
+          description: ID of the transaction
+        - in: body
+          name: body
+          description: add Transaction Comment Payload
+          required: true
+          schema:
+            $ref: '#/definitions/AddTransactionComment'
+      responses:
+        '200':
+          description: Transaction comment add successfully
+          schema:
+            $ref: '#/definitions/AddTransactionComment'
+        '400':
+          description: Invalid Fields
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal Server Error
+  /user/transactions/{transactionId}/DeletComment:
+    delete:
+        security:
+        - Bearer: []
+        tags:
+        - User Module
+        summary: Delete Transaction Comment
+        description: API for deleting the comment of a specific transaction
+        parameters:
+        - in: path
+            name: transactionId
+            type: string
+            required: true
+            description: ID of the transaction
+        responses:
+        '200':
+            description: Transaction comment deleted successfully
+        '404':
+            description: Transaction not found
+        '500':
+            description: Internal Server Error
+  /user/transactions/{transactionId}/ModifComment:
+    patch:
+        security:
+        - Bearer: []
+        tags:
+        - User Module
+        summary: Patch Transaction Comment
+        description: API for modifying the comment of a specific transaction
+        parameters:
+        - in: path
+            name: transactionId
+            type: string
+            required: true
+            description: ID of the transaction
+        - in: body
+            name: body
+            description: Modify Transaction Comment Payload
+            required: true
+            schema:
+            $ref: '#/definitions/ModifyTransactionComment'
+        responses:
+        '200':
+            description: Transaction comment modified successfully
+            schema:
+            $ref: '#/definitions/ModifyTransactionComment'
+        '400':
+            description: Invalid Fields
+        '404':
+            description: Transaction not found
+        '500':
+            description: Internal Server Error
+
+  /user/transactions/{transactionId}:
+    get:
+        security:
+        - Bearer: []
+        tags:
+        - User Module
+        summary: Get Transaction by ID
+        description: API for fetching details of a specific transaction by its ID
+        parameters:
+        - in: path
+            name: transactionId
+            type: string
+            required: true
+            description: ID of the transaction
+        responses:
+        '200':
+            description: Transaction details retrieved successfully
+            schema:
+            $ref: '#/definitions/TransactionDetails'
+        '400':
+            description: Invalid Fields
+        '404':
+            description: Transaction not found
+        '500':
+            description: Internal Server Error
+
+
 securityDefinitions:
   Bearer:
     type: apiKey
@@ -132,20 +278,31 @@ definitions:
       password:
         type: string
         description: user password
-  ApiResponse:
+  TransactionWithId:  # Nouvelle définition pour inclure l'ID
     type: object
     properties:
-      status:
-        type: integer
-      message:
+      id:
         type: string
-      body:
-        type: object
-        properties:
-          id:
-            type: string
-          email:
-            type: string
+        description: Transaction ID
+      amount:
+        type: number
+        description: Transaction amount
+      description:
+        type: string
+        description: Transaction description
+      date:
+        type: string
+        format: date
+        description: Transaction date
+      category:
+        type: string
+        description: Transaction category
+      location:
+        type: string
+        description: Transaction location
+      commentaire:
+        type: string
+        description: Commentaire de la transaction
   LoginResponse:
     type: object
     properties:
@@ -156,3 +313,46 @@ definitions:
     properties:
       userName:
         type: string
+  AddTransactionComment:
+    type: object
+    properties:
+      comment:
+        type: string
+        description: New comment for the transaction
+  AddUpdateTransactionComment:
+    type: object
+    properties:
+      comment:
+        type: string
+        description: Comment for the transaction
+  ModifyTransactionComment:
+    type: object
+    properties:
+      comment:
+        type: string
+        description: Modified comment for the transaction
+  TransactionDetails:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Transaction ID
+      amount:
+        type: number
+        description: Transaction amount
+      description:
+        type: string
+        description: Transaction description
+      date:
+        type: string
+        format: date
+        description: Transaction date
+      category:
+        type: string
+        description: Transaction category
+      location:
+        type: string
+        description: Transaction location
+      commentaire:
+        type: string
+        description: Commentaire de la transaction
